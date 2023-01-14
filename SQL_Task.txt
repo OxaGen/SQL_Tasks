@@ -1,0 +1,65 @@
+1. Print all suppliers that are located in a city with a name starting with "S", but not in a country starting with "S".
+SELECT * FROM [Customers] WHERE City LIKE "S%" AND Country NOT LIKE "S%"
+
+2. Print in alphabetical order all the cities from the database that are not in Germany, not in France and not in England.
+SELECT City FROM [Customers] WHERE Country NOT LIKE "France" AND Country NOT LIKE "Germany" AND Country NOT LIKE "UK" ORDER BY City
+
+3. Select information about employees in alphabetical order by Last Name and First Name who have a Bachelor of Arts degree.
+SELECT * FROM [Employees] WHERE Notes LIKE "%BA%" AND Notes NOT LIKE "%MBA%" ORDER BY LastName
+
+4. Use two ways to insert a record about a new client:
+
+a. Specify an ID in the request.
+INSERT INTO Customers (CustomerID, CustomerName, ContactName, Address, City, PostalCode, Country)
+VALUES ('95', 'Sherlock', 'Holmes', 'Baker Street 220 b', 'London', '40WER1', 'UK');
+
+b. Do not explicitly specify an ID in the request, the identifier must be generated automatically.
+INSERT INTO Customers (CustomerName, ContactName, Address, City, PostalCode, Country)
+VALUES ('Sherlock', 'Holmes', 'Baker Street 220 b', 'London', '40WER1', 'UK');
+
+5. Make an update of any record in the database.
+UPDATE Customers
+SET Address ='Baker Street 220'
+WHERE PostalCode='05023';
+
+6. To delete a record from any table.
+DELETE FROM Employees WHERE BirthDate LIKE '%1958%';
+
+7. Print the names of all the people who bought seafood.
+SELECT Customers.CustomerID, Customers.CustomerName
+FROM Customers
+INNER JOIN Orders ON Orders.CustomerID = Customers.CustomerID
+INNER JOIN OrderDetails ON OrderDetails.OrderID =Orders.OrderID
+INNER JOIN Products ON OrderDetails.ProductID=Products.ProductID
+INNER JOIN Categories ON Products.CategoryID=Categories.CategoryID
+WHERE Categories.CategoryID ="8" GROUP BY Customers.CustomerID
+
+8. Print the customer's name and the number of purchases made by the client.
+SELECT Customers.CustomerName, OrderDetails.Quantity AS ProductAmount
+FROM Customers
+INNER JOIN Orders ON Orders.CustomerID = Customers.CustomerID
+INNER JOIN OrderDetails ON OrderDetails.OrderID =Orders.OrderID
+INNER JOIN Products ON OrderDetails.ProductID=Products.ProductID
+ GROUP BY Customers.CustomerID
+
+9. Print the names and IDs of the five most purchased products. 
+SELECT OrderDetails.ProductID, Products.ProductName, OrderDetails.Quantity
+FROM OrderDetails
+JOIN Products ON OrderDetails.ProductID = Products.ProductID
+ORDER BY Quantity DESC
+LIMIT 5
+
+10. Print how many orders were made by each shipper. Display the names of the shippers and the number of orders they have completed.
+SELECT Shippers.ShipperName, OrderDetails.Quantity
+FROM OrderDetails
+JOIN Orders ON OrderDetails.OrderID = Orders.OrderID
+JOIN Shippers ON Orders.ShipperID = Shippers.ShipperID
+ORDER BY ShipperName
+
+11.Print the names of the customers and the average order receipt, which amounts from $1,000 (inclusive). The average order amount must be rounded to two decimal places.
+SELECT Customers.CustomerID, Customers.CustomerName, ROUND(AVG(Price*Quantity),2) AS Total FROM OrderDetails, Customers
+JOIN Products ON Products.ProductID = OrderDetails.ProductID
+JOIN Orders ON Orders.OrderID = OrderDetails.OrderID
+GROUP BY Orders.CustomerID
+HAVING Total >=1000
+ORDER BY Total ASC
